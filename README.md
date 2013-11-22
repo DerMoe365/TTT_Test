@@ -1,0 +1,1 @@
+See also this [static circle packing](/mbostock/4063530) example.
