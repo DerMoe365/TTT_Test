@@ -12,6 +12,11 @@
   stroke-width: 1.5px;
 }
 
+.node--root {
+  stroke: #777;
+  stroke-width: 2px;
+}
+
 .node--leaf {
   fill: white;
 }
@@ -19,6 +24,7 @@
 .label {
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 }
 
 .label,
@@ -32,7 +38,8 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var diameter = 960;
+var margin = 10,
+    diameter = 960 - margin - margin;
 
 var x = d3.scale.linear()
     .range([0, diameter]);
@@ -41,9 +48,9 @@ var y = d3.scale.linear()
     .range([0, diameter]);
 
 var color = d3.scale.linear()
-    .domain([4, -1])
-    .range(["steelblue", "white"])
-    .interpolate(d3.interpolateLab);
+    .domain([-1, 5])
+    .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
+    .interpolate(d3.interpolateHcl);
 
 var pack = d3.layout.pack()
     .padding(2)
@@ -51,30 +58,31 @@ var pack = d3.layout.pack()
     .value(function(d) { return d.size; })
 
 var svg = d3.select("body").append("svg")
-    .attr("width", diameter)
-    .attr("height", diameter);
+    .attr("width", diameter + margin + margin)
+    .attr("height", diameter + margin + margin)
+  .append("g")
+    .attr("transform", "translate(" + margin + "," + margin + ")");
 
 d3.json("flare.json", function(error, root) {
   var focus = root,
       nodes = pack.nodes(root);
 
-  var node = svg.append("g").selectAll("circle")
+  svg.append("g").selectAll("circle")
       .data(nodes)
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .attr("r", function(d) { return d.r; })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
       .on("click", function(d) { return zoom(focus == d ? root : d); });
 
-  var label = svg.append("g").selectAll("text")
+  svg.append("g").selectAll("text")
       .data(nodes)
     .enter().append("text")
       .attr("class", "label")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .style("opacity", function(d) { return d.parent === root ? 1 : 0; })
       .text(function(d) { return d.name; });
-
-  var item = svg.selectAll("circle,text")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   d3.select(window)
       .on("click", function() { zoom(root); });
@@ -87,16 +95,15 @@ d3.json("flare.json", function(error, root) {
     y.domain([d.y - d.r, d.y + d.r]);
     d3.event.stopPropagation();
 
-    d3.transition().duration(d3.event.altKey ? 7500 : 750).each(function() {
-      item.transition()
-          .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+    var transition = d3.selectAll("text,circle").transition()
+        .duration(d3.event.altKey ? 7500 : 750)
+        .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
 
-      node.transition()
-          .attr("r", function(d) { return k * d.r; });
+    transition.filter("circle")
+        .attr("r", function(d) { return k * d.r; });
 
-      label.transition()
-          .style("opacity", function(d) { return d.parent === focus ? 1 : 0; });
-    });
+    transition.filter("text")
+        .style("opacity", function(d) { return d.parent === focus ? 1 : 0; });
   }
 });
 
