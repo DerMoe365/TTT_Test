@@ -39,13 +39,14 @@
 <script>
 
 var margin = 10,
-    diameter = 960 - margin - margin;
+    outerDiameter = 960,
+    innerDiameter = outerDiameter - margin - margin;
 
 var x = d3.scale.linear()
-    .range([0, diameter]);
+    .range([0, innerDiameter]);
 
 var y = d3.scale.linear()
-    .range([0, diameter]);
+    .range([0, innerDiameter]);
 
 var color = d3.scale.linear()
     .domain([-1, 5])
@@ -54,12 +55,12 @@ var color = d3.scale.linear()
 
 var pack = d3.layout.pack()
     .padding(2)
-    .size([diameter, diameter])
+    .size([innerDiameter, innerDiameter])
     .value(function(d) { return d.size; })
 
 var svg = d3.select("body").append("svg")
-    .attr("width", diameter + margin + margin)
-    .attr("height", diameter + margin + margin)
+    .attr("width", outerDiameter)
+    .attr("height", outerDiameter)
   .append("g")
     .attr("transform", "translate(" + margin + "," + margin + ")");
 
@@ -90,7 +91,7 @@ d3.json("flare.json", function(error, root) {
   function zoom(d, i) {
     focus = d;
 
-    var k = diameter / d.r / 2;
+    var k = innerDiameter / d.r / 2;
     x.domain([d.x - d.r, d.x + d.r]);
     y.domain([d.y - d.r, d.y + d.r]);
     d3.event.stopPropagation();
@@ -107,6 +108,6 @@ d3.json("flare.json", function(error, root) {
   }
 });
 
-d3.select(self.frameElement).style("height", diameter + "px");
+d3.select(self.frameElement).style("height", outerDiameter + "px");
 
 </script>
