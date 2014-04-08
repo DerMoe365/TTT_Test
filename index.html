@@ -84,8 +84,7 @@ d3.json("flare.json", function(error, root) {
       .call(zoomTo([root.x, root.y, root.r]));
 
   function zoom(d) {
-    var focus0 = focus;
-    focus = d;
+    var focus0 = focus; focus = d;
 
     var transition = d3.transition()
         .duration(d3.event.altKey ? 7500 : 750)
@@ -104,10 +103,9 @@ d3.json("flare.json", function(error, root) {
   }
 
   function zoomTo(v) {
-    var k = root.r / v[2];
+    var k = root.r / v[2]; view = v;
     node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
     circle.attr("r", function(d) { return d.r * k; });
-    view = v;
   }
 });
 
