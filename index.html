@@ -34,7 +34,7 @@
 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
 var diameter = 960;
@@ -56,6 +56,8 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
 
 d3.json("flare.json", function(error, root) {
+  if (error) return console.error(error);
+
   var focus = root,
       nodes = pack.nodes(root),
       view;
@@ -78,8 +80,9 @@ d3.json("flare.json", function(error, root) {
   var node = svg.selectAll("circle,text");
 
   d3.select(window)
-      .on("click", function() { zoom(root); })
-      .call(zoomTo([root.x, root.y, root.r]));
+      .on("click", function() { zoom(root); });
+
+  zoomTo([root.x, root.y, root.r]);
 
   function zoom(d) {
     var focus0 = focus; focus = d;
