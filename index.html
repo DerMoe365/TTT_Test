@@ -37,9 +37,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var margin = 10,
-    outerDiameter = 960,
-    innerDiameter = outerDiameter - margin - margin;
+var diameter = 960;
 
 var color = d3.scale.linear()
     .domain([-1, 5])
@@ -48,14 +46,14 @@ var color = d3.scale.linear()
 
 var pack = d3.layout.pack()
     .padding(2)
-    .size([innerDiameter, innerDiameter])
+    .size([diameter - 20, diameter - 20])
     .value(function(d) { return d.size; })
 
 var svg = d3.select("body").append("svg")
-    .attr("width", outerDiameter)
-    .attr("height", outerDiameter)
+    .attr("width", diameter)
+    .attr("height", diameter)
   .append("g")
-    .attr("transform", "translate(" + outerDiameter / 2 + "," + outerDiameter / 2 + ")");
+    .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
 
 d3.json("flare.json", function(error, root) {
   var focus = root,
@@ -109,6 +107,6 @@ d3.json("flare.json", function(error, root) {
   }
 });
 
-d3.select(self.frameElement).style("height", outerDiameter + "px");
+d3.select(self.frameElement).style("height", diameter + "px");
 
 </script>
