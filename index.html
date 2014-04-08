@@ -59,7 +59,8 @@ var svg = d3.select("body").append("svg")
 
 d3.json("flare.json", function(error, root) {
   var focus = root,
-      nodes = pack.nodes(root);
+      nodes = pack.nodes(root),
+      view;
 
   var circle = svg.append("g").selectAll("circle")
       .data(nodes)
@@ -89,7 +90,7 @@ d3.json("flare.json", function(error, root) {
     var transition = d3.transition()
         .duration(d3.event.altKey ? 7500 : 750)
         .tween("zoom", function(d) {
-          var i = d3.interpolateZoom([focus0.x, focus0.y, focus0.r], [focus.x, focus.y, focus.r]);
+          var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r]);
           return function(t) { zoomTo(i(t)); };
         });
 
@@ -102,10 +103,11 @@ d3.json("flare.json", function(error, root) {
     d3.event.stopPropagation();
   }
 
-  function zoomTo(z) {
-    var k = root.r / z[2];
-    node.attr("transform", function(d) { return "translate(" + (d.x - z[0]) * k + "," + (d.y - z[1]) * k + ")"; });
+  function zoomTo(v) {
+    var k = root.r / v[2];
+    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
     circle.attr("r", function(d) { return d.r * k; });
+    view = v;
   }
 });
 
