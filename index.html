@@ -11,11 +11,6 @@
   stroke-width: 1.5px;
 }
 
-.node--root {
-  stroke: #777;
-  stroke-width: 2px;
-}
-
 .node--leaf {
   fill: white;
 }
@@ -67,7 +62,7 @@ d3.json("flare.json", function(error, root) {
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
-      .on("click", function(d) { zoom(focus == d ? root : d); d3.event.stopPropagation(); });
+      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
   var text = svg.selectAll("text")
       .data(nodes)
@@ -79,7 +74,8 @@ d3.json("flare.json", function(error, root) {
 
   var node = svg.selectAll("circle,text");
 
-  d3.select(window)
+  d3.select("body")
+      .style("background", color(-1))
       .on("click", function() { zoom(root); });
 
   zoomTo([root.x, root.y, root.r]);
