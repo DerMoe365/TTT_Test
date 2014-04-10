@@ -32,7 +32,8 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var diameter = 960;
+var margin = 20,
+    diameter = 960;
 
 var color = d3.scale.linear()
     .domain([-1, 5])
@@ -41,7 +42,7 @@ var color = d3.scale.linear()
 
 var pack = d3.layout.pack()
     .padding(2)
-    .size([diameter - 20, diameter - 20])
+    .size([diameter - margin, diameter - margin])
     .value(function(d) { return d.size; })
 
 var svg = d3.select("body").append("svg")
@@ -78,7 +79,7 @@ d3.json("flare.json", function(error, root) {
       .style("background", color(-1))
       .on("click", function() { zoom(root); });
 
-  zoomTo([root.x, root.y, root.r * 2]);
+  zoomTo([root.x, root.y, root.r * 2 + margin]);
 
   function zoom(d) {
     var focus0 = focus; focus = d;
@@ -86,7 +87,7 @@ d3.json("flare.json", function(error, root) {
     var transition = d3.transition()
         .duration(d3.event.altKey ? 7500 : 750)
         .tween("zoom", function(d) {
-          var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+          var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2 + margin]);
           return function(t) { zoomTo(i(t)); };
         });
 
@@ -98,7 +99,7 @@ d3.json("flare.json", function(error, root) {
   }
 
   function zoomTo(v) {
-    var k = root.r * 2 / v[2]; view = v;
+    var k = diameter / v[2]; view = v;
     node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
     circle.attr("r", function(d) { return d.r * k; });
   }
